@@ -4,6 +4,7 @@ import info.aduna.iteration.CloseableIteration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -81,21 +82,23 @@ public class BEDFileFilterReader implements
 		private final Resource subj;
 		private final Value obj;
 		private final URI pred;
-		private final Scanner scanner;
+		private final BEDFileReader reader;
 		private volatile boolean done = false;
 		private final File bedFile;
 		private final ValueFactory vf;
-		private final Pattern tab = Pattern.compile("\t");
 		private final Pattern comma = Pattern.compile(",");
-		private final Pattern digits = Pattern.compile("\\d+");
-
+		
 		public ReaderRunner(File bedFile, Resource subj, URI pred, Value obj,
 				BlockingQueue<Statement> statements, ValueFactory vf) {
 
 			this.vf = vf;
 			try {
-				this.scanner = new Scanner(bedFile);
+				this.reader = new BEDFileReader(bedFile);
 			} catch (FileNotFoundException e) {
+				done = true;
+				log.error("Can't find bed file to work on");
+				throw new RuntimeException(e);
+			} catch (IOException e) {
 				done = true;
 				log.error("Can't find bed file to work on");
 				throw new RuntimeException(e);
@@ -111,24 +114,8 @@ public class BEDFileFilterReader implements
 		public void run() {
 			long lineNo = 0;
 			String filePath = "file:///" + bedFile.getAbsolutePath();
-			while (scanner.hasNextLine()) {
-				String[] record = new String[12]; // max 12 fields in a bed file
-													// line
-
-				int fieldId = 0;
-				for (String field : tab.split(scanner.nextLine())) {
-					if (fieldId < 12) {
-						record[fieldId] = field;
-						fieldId++;
-					}
-				}
-				// Comment lines might be in your data which do not have tabs/or
-				// digits
-				if (record[1] != null && record[2] != null
-						&& digits.matcher(record[1]).find()
-						&& digits.matcher(record[2]).find())
-					convertLineToTriples(filePath, record, lineNo++);
-//				scanner.next();
+			while (reader.hasNext()) {
+				convertLineToTriples(filePath, reader.next(), lineNo++);
 			}
 			done = true;
 			synchronized (wait) {

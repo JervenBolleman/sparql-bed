@@ -15,6 +15,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<sesame.version>2.7.0-beta3-SNAPSHOT</sesame.version>
+		<picard.version>1.70</picard.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -34,6 +35,14 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
+		</repository>
+		<repository>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>ens</id>
+			<name>ENS repository</name>
+			<url>http://transcriptome.ens.fr/maven2</url>
 		</repository>
 	</repositories>
 	<build>
@@ -134,6 +143,16 @@
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-queryresultio-sparqljson</artifactId>
 			<version>${sesame.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.picard</groupId>
+			<artifactId>picard</artifactId>
+			<version>${picard.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.picard</groupId>
+			<artifactId>sam</artifactId>
+			<version>${picard.version}</version>
 		</dependency>
 	</dependencies>
 	<reporting>
