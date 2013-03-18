@@ -9,7 +9,9 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.algebra.Join;
 import org.openrdf.query.algebra.evaluation.TripleSource;
 
 public class BEDTripleSource implements TripleSource {
@@ -33,6 +35,12 @@ public class BEDTripleSource implements TripleSource {
 	@Override
 	public ValueFactory getValueFactory() {
 		return vf;
+	}
+
+	public CloseableIteration<BindingSet, QueryEvaluationException>  getStatements(BindingSet bindings, Join join) {
+		return new BEDFileBindingReader(file, bindings, join,
+				getValueFactory());
+		
 	}
 
 }

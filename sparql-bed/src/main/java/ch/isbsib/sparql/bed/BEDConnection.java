@@ -15,13 +15,11 @@ import org.openrdf.query.Dataset;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.EvaluationStrategy;
-import org.openrdf.query.algebra.evaluation.TripleSource;
 import org.openrdf.query.algebra.evaluation.impl.BindingAssigner;
 import org.openrdf.query.algebra.evaluation.impl.CompareOptimizer;
 import org.openrdf.query.algebra.evaluation.impl.ConjunctiveConstraintSplitter;
 import org.openrdf.query.algebra.evaluation.impl.ConstantOptimizer;
 import org.openrdf.query.algebra.evaluation.impl.DisjunctiveConstraintOptimizer;
-import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
 import org.openrdf.query.algebra.evaluation.impl.FilterOptimizer;
 import org.openrdf.query.algebra.evaluation.impl.IterativeEvaluationOptimizer;
 import org.openrdf.query.algebra.evaluation.impl.OrderLimitOptimizer;
@@ -59,8 +57,8 @@ public class BEDConnection implements SailConnection {
 			TupleExpr tupleExpr, Dataset dataset, BindingSet bindings,
 			boolean includeInferred) throws SailException {
 		try {
-			TripleSource tripleSource = new BEDTripleSource(file, vf);
-			EvaluationStrategy strategy = new EvaluationStrategyImpl(
+			BEDTripleSource tripleSource = new BEDTripleSource(file, vf);
+			EvaluationStrategy strategy = new OneLineAwareEvaluationStrategy(
 					tripleSource);
 			tupleExpr = tupleExpr.clone();
 			new BindingAssigner().optimize(tupleExpr, dataset, bindings);

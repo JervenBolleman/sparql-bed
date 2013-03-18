@@ -7,7 +7,6 @@ import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailBase;
-import org.openrdf.sail.memory.MemoryStore;
 
 public class BEDRepository extends SailBase {
 	private Sail store;
