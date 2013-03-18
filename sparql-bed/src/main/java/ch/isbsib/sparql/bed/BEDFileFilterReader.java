@@ -3,10 +3,7 @@ package ch.isbsib.sparql.bed;
 import info.aduna.iteration.CloseableIteration;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,7 +11,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
 import org.broad.tribble.AbstractFeatureReader;
-import org.broad.tribble.CloseableTribbleIterator;
 import org.broad.tribble.Feature;
 import org.broad.tribble.annotation.Strand;
 import org.broad.tribble.bed.BEDCodec;
