@@ -1,9 +1,9 @@
 package ch.isbsib.sparql.bed;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
+
+import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,12 +22,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.memory.MemoryStore;
-
-import ch.isbsib.sparql.bed.BED;
-import ch.isbsib.sparql.bed.BEDRepository;
-import ch.isbsib.sparql.bed.FALDO;
-
-import junit.framework.TestCase;
 
 public class BEDRepositoryTest extends TestCase {
 	@Rule
