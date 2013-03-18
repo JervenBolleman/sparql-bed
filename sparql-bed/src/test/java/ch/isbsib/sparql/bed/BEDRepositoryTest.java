@@ -137,7 +137,7 @@ public class BEDRepositoryTest extends TestCase {
 		BindingSet next = eval.next();
 		assertNotNull(next);
 		Binding lb = next.getBinding("avgLength");
-		assertEquals("", "1167", lb.getValue()
+		assertEquals("", "1166", lb.getValue()
 				.stringValue());
 	}
 }

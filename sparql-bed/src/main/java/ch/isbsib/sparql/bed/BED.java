@@ -14,6 +14,7 @@ public class BED {
 	public static final URI CHROMOSOME;
 	public static final URI SCORE;
 	public static final URI EXON;
+	public static final URI FEATURE_CLASS;
 	
 	static {
 		final ValueFactory f = ValueFactoryImpl.getInstance();
@@ -22,5 +23,6 @@ public class BED {
 		CHROMOSOME = f.createURI(NAMESPACE, "Chromosome");
 		SCORE = f.createURI(NAMESPACE, "score");
 		EXON = f.createURI(NAMESPACE, "exon");
+		FEATURE_CLASS= f.createURI(NAMESPACE, "Feature");
 	}
 }

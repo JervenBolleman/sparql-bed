@@ -5,6 +5,7 @@ import info.aduna.iteration.CloseableIteration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -12,6 +13,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
+import org.broad.tribble.AbstractFeatureReader;
+import org.broad.tribble.CloseableTribbleIterator;
+import org.broad.tribble.Feature;
+import org.broad.tribble.annotation.Strand;
+import org.broad.tribble.bed.BEDCodec;
+import org.broad.tribble.bed.BEDFeature;
+import org.broad.tribble.bed.FullBEDFeature.Exon;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -82,27 +90,20 @@ public class BEDFileFilterReader implements
 		private final Resource subj;
 		private final Value obj;
 		private final URI pred;
-		private final BEDFileReader reader;
+		private final AbstractFeatureReader reader;
 		private volatile boolean done = false;
 		private final File bedFile;
 		private final ValueFactory vf;
 		private final Pattern comma = Pattern.compile(",");
-		
+
 		public ReaderRunner(File bedFile, Resource subj, URI pred, Value obj,
 				BlockingQueue<Statement> statements, ValueFactory vf) {
 
 			this.vf = vf;
-			try {
-				this.reader = new BEDFileReader(bedFile);
-			} catch (FileNotFoundException e) {
-				done = true;
-				log.error("Can't find bed file to work on");
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				done = true;
-				log.error("Can't find bed file to work on");
-				throw new RuntimeException(e);
-			}
+
+			this.reader = AbstractFeatureReader.getFeatureReader(
+					bedFile.getAbsolutePath(), new BEDCodec(), false);
+
 			this.subj = subj;
 			this.pred = pred;
 			this.obj = obj;
@@ -114,85 +115,87 @@ public class BEDFileFilterReader implements
 		public void run() {
 			long lineNo = 0;
 			String filePath = "file:///" + bedFile.getAbsolutePath();
-			while (reader.hasNext()) {
-				convertLineToTriples(filePath, reader.next(), lineNo++);
-			}
-			done = true;
-			synchronized (wait) {
-				wait.notifyAll();
+			Iterable<Feature> iter;
+			try {
+				iter = reader.iterator();
+				for (Feature feature : iter) {
+					convertLineToTriples(filePath, feature, lineNo++);
+				}
+			} catch (IOException e) {
+				log.error("IO error while reading bed file", e);
+			} finally {
+
+				done = true;
+				synchronized (wait) {
+					wait.notifyAll();
+				}
 			}
 		}
 
-		protected void convertLineToTriples(String filePath, String[] record,
+		protected void convertLineToTriples(String filePath, Feature feature,
 				long lineNo) {
 			String recordPath = filePath + '/' + lineNo;
 			URI recordId = vf.createURI(recordPath);
-			add(recordId, BED.CHROMOSOME, record[0]);
-
-			URI alignStartId = vf.createURI(recordPath + "start");
-			add(recordId, FALDO.BEGIN, alignStartId);
-			add(alignStartId, RDF.TYPE, FALDO.EXACT_POSITION);
-			add(alignStartId, FALDO.position, Long.parseLong(record[1]));
-
-			URI alignEndId = vf.createURI(recordPath + "end");
-			add(recordId, FALDO.END, alignEndId);
-			add(alignEndId, RDF.TYPE, FALDO.EXACT_POSITION);
-			add(alignEndId, FALDO.position, Long.parseLong(record[2]));
-
-			if (record[3] != null) // name
-				add(recordId, RDFS.LABEL, record[3]);
-			if (record[4] != null) // score
-				add(recordId, BED.SCORE, record[4]);
-			addStrandedNessInformation(record, alignEndId);
-			// we skip position 678 as these are colouring instructions
-			int blockCount = 0;
-			URI[] blockids = null;
-			if (record[9] != null) {// block/exon count
-				blockCount = Integer.parseInt(record[9]);
-				blockids = new URI[blockCount];
-				for (int a = 0; a < blockCount; a++) {
-					blockids[a] = vf.createURI(recordPath + "/block/" + a);
-					add(recordId, BED.EXON, blockids[a]);
-				}
-			}
-			String[] sizes = null;
-			if (record[10] != null) {
-				sizes = comma.split(record[10]);
-
-			}
-			if (record[11] != null) {
-				String[] begin = comma.split(record[11]);
-				for (int i = 0; i < sizes.length && i < blockCount; i++) {
-					String size = sizes[i];
-					URI blockId = blockids[i];
-					URI beginId = vf.createURI(blockId.getNamespace(),
-							blockId.getLocalName() + "/begin");
-					URI endId = vf.createURI(blockId.getNamespace(),
-							blockId.getLocalName() + "/begin");
-					add(blockId, RDF.TYPE, FALDO.REGION);
-					add(blockId, FALDO.BEGIN, beginId);
-					add(beginId, RDF.TYPE, FALDO.EXACT_POSITION);
-					long beginPos = Long.parseLong(begin[i]);
-					add(beginId, FALDO.position, beginPos);
-					add(blockId, FALDO.END, endId);
-					add(endId, RDF.TYPE, FALDO.EXACT_POSITION);
-					add(endId, FALDO.position, beginPos + Long.parseLong(size));
-				}
+			add(recordId, BED.CHROMOSOME, feature.getChr());
+			add(recordId, RDF.TYPE, BED.FEATURE_CLASS);
+			add(recordId, RDF.TYPE, FALDO.REGION_CLASS);
+			URI alignStartId = vf.createURI(recordPath + "#start");
+			add(recordId, FALDO.BEGIN_PREDICATE, alignStartId);
+			add(alignStartId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+			add(alignStartId, FALDO.POSTION_PREDICATE, feature.getStart());
+			add(alignStartId, FALDO.REFERENCE_PREDICATE, feature.getChr());
+			URI alignEndId = vf.createURI(recordPath + "#end");
+			add(recordId, FALDO.END_PREDICATE, alignEndId);
+			add(alignEndId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+			add(alignEndId, FALDO.POSTION_PREDICATE, feature.getEnd());
+			add(alignEndId, FALDO.REFERENCE_PREDICATE, feature.getChr());
+			if (feature instanceof BEDFeature) {
+				convertLineToTriples(filePath, (BEDFeature) feature, lineNo);
 			}
 		}
 
-		protected void addStrandedNessInformation(String[] record,
-				URI alignEndId) {
-			if (record[5] != null) // strand
-			{
-				if ("+".equals(record[5])) {
-					add(alignEndId, RDF.TYPE, FALDO.FORWARD_STRAND_POSITION);
-				} else if ("-".equals(record[5])) {
-					add(alignEndId, RDF.TYPE, FALDO.REVERSE_STRAND_POSITION);
-				} else {
-					add(alignEndId, RDF.TYPE, FALDO.STRANDED_POSITION);
-				}
+		protected void convertLineToTriples(String filePath,
+				BEDFeature feature, long lineNo) {
+			String recordPath = filePath + '/' + lineNo;
+			URI recordId = vf.createURI(recordPath);
+			if (feature.getName() != null) // name
+				add(recordId, RDFS.LABEL, feature.getName());
+			if (feature.getScore() != Float.NaN) // score
+				add(recordId, BED.SCORE, feature.getScore());
+			addStrandedNessInformation(feature, recordId);
+			// we skip position 678 as these are colouring instructions
+
+			for (Exon exon : feature.getExons()) {
+				
+				String exonPath = recordPath + "/exon/" + exon.getNumber();
+				URI exonId = vf.createURI(exonPath);
+				URI beginId = vf.createURI(exonPath + "/begin");
+				URI endId = vf.createURI(exonPath + "/end");
+				add(recordId, BED.EXON, endId);
+				add(exonId, RDF.TYPE, FALDO.REGION_CLASS);
+				add(exonId, FALDO.BEGIN_PREDICATE, beginId);
+				add(beginId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+				add(beginId, FALDO.POSTION_PREDICATE, exon.getCdStart());
+				add(beginId, FALDO.REFERENCE_PREDICATE, feature.getChr());
+				add(exonId, FALDO.END_PREDICATE, endId);
+				add(endId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+				add(endId, FALDO.POSTION_PREDICATE, exon.getCdEnd());
+				add(endId, FALDO.REFERENCE_PREDICATE, feature.getChr());
 			}
+
+		}
+
+		protected void addStrandedNessInformation(BEDFeature feature,
+				URI alignEndId) {
+
+			if (Strand.POSITIVE == feature.getStrand()) {
+				add(alignEndId, RDF.TYPE, FALDO.FORWARD_STRAND_POSITION_CLASS);
+			} else if (Strand.NEGATIVE == feature.getStrand()) {
+				add(alignEndId, RDF.TYPE, FALDO.REVERSE_STRANDED_POSITION_CLASS);
+			} else {
+				add(alignEndId, RDF.TYPE, FALDO.STRANDED_POSITION_CLASS);
+			}
+
 		}
 
 		private void add(URI subject, URI predicate, String string) {
@@ -200,7 +203,12 @@ public class BEDFileFilterReader implements
 
 		}
 
-		private void add(URI subject, URI predicate, long string) {
+		private void add(URI subject, URI predicate, int string) {
+			add(subject, predicate, vf.createLiteral(string));
+
+		}
+
+		private void add(URI subject, URI predicate, float string) {
 			add(subject, predicate, vf.createLiteral(string));
 
 		}

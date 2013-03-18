@@ -145,14 +145,9 @@
 			<version>${sesame.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.picard</groupId>
+			<groupId>org.utgenome.thirdparty</groupId>
 			<artifactId>picard</artifactId>
-			<version>${picard.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.picard</groupId>
-			<artifactId>sam</artifactId>
-			<version>${picard.version}</version>
+			<version>1.86.0</version>
 		</dependency>
 	</dependencies>
 	<reporting>
