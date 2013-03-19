@@ -10,4 +10,5 @@ mvn assembly:assembly
 ./sparql-bed.sh src/test/resources/example.bed "SELECT ?s ?p WHERE {?s <http://biohackathon.org/resource/faldo#position> ?p}"
 ```
 
-See the issue lists for open improvements to do.
+See the issue lists for future tasks..
+The only requirements are a maven3 and java6+ installation.
