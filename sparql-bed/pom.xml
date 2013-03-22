@@ -84,7 +84,70 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<configuration>
+					<war>${project.build.directory}/openrdf-sesame-webapp.war</war>
+					<webAppConfig>
+						<jettyEnvXml>${project.build.directory}/classes/jetty-env.xml</jettyEnvXml>
+					</webAppConfig>
+					<systemProperties>
+						<systemProperty>
+							<name>info.aduna.platform.appdata.basedi=</name>
+							<value>${project.build.directory}/</value>
+						</systemProperty>
+					</systemProperties>
+					<contextHandlers>
+						<contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+							<war>${project.build.directory}/openrdf-sesame-webapp.war</war>
+							<contextPath>/openrdf-workbench</contextPath>
+						</contextHandler>
+						<contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+							<war>${project.build.directory}/openrdf-sesame-server.war</war>
+							<contextPath>/openrdf-sesame</contextPath>
+						</contextHandler>
+					</contextHandlers>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.openrdf.sesame</groupId>
+									<artifactId>sesame-http-workbench</artifactId>
+									<version>${sesame.version}</version>
+									<type>war</type>
+									<overWrite>true</overWrite>
+									<destFileName>openrdf-sesame-webapp.war</destFileName>
+								</artifactItem>
+							</artifactItems>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.openrdf.sesame</groupId>
+									<artifactId>sesame-http-server</artifactId>
+									<version>${sesame.version}</version>
+									<type>war</type>
+									<overWrite>true</overWrite>
+									<destFileName>openrdf-sesame-server.war</destFileName>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>
+								${project.build.directory}
+							</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+
 	</build>
 
 	<dependencies>
@@ -102,6 +165,11 @@
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-query</artifactId>
+			<version>${sesame.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-runtime</artifactId>
 			<version>${sesame.version}</version>
 		</dependency>
 		<dependency>
@@ -141,6 +209,18 @@
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-http-workbench</artifactId>
+			<version>${sesame.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-http-server</artifactId>
+			<version>${sesame.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-queryresultio-sparqljson</artifactId>
 			<version>${sesame.version}</version>
 		</dependency>
@@ -159,7 +239,10 @@
 					<configLocation>config/sun_checks.xml</configLocation>
 				</configuration>
 			</plugin>
+
 		</plugins>
 
 	</reporting>
+
+
 </project>
