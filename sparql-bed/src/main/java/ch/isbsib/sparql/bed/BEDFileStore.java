@@ -3,12 +3,11 @@ package ch.isbsib.sparql.bed;
 import java.io.File;
 
 import org.openrdf.model.ValueFactory;
-import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailBase;
 
-public class BEDRepository extends SailBase {
+public class BEDFileStore extends SailBase {
 	private File file;
 	private ValueFactory vf;
 

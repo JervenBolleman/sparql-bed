@@ -57,7 +57,7 @@ public class BEDRepositoryTest extends TestCase {
 			RepositoryException, SailException {
 
 		assertTrue(newFile.exists());
-		BEDRepository rep = new BEDRepository();
+		BEDFileStore rep = new BEDFileStore();
 		rep.setDataDir(dataDir);
 		rep.setSamFile(newFile);
 		rep.setValueFactory(new ValueFactoryImpl());
@@ -83,7 +83,7 @@ public class BEDRepositoryTest extends TestCase {
 			RepositoryException, SailException {
 
 		assertTrue(newFile.exists());
-		BEDRepository rep = new BEDRepository();
+		BEDFileStore rep = new BEDFileStore();
 		rep.setDataDir(dataDir);
 		rep.setSamFile(newFile);
 		rep.setValueFactory(new ValueFactoryImpl());
@@ -118,7 +118,7 @@ public class BEDRepositoryTest extends TestCase {
 			RepositoryException, SailException {
 
 		assertTrue(newFile.exists());
-		BEDRepository rep = new BEDRepository();
+		BEDFileStore rep = new BEDFileStore();
 		rep.setDataDir(dataDir);
 		rep.setSamFile(newFile);
 		rep.setValueFactory(new ValueFactoryImpl());

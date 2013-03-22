@@ -78,7 +78,11 @@ class BindingReaderRunner implements Runnable {
 		} catch (IOException e) {
 			log.error("IO error while reading bed file", e);
 		} finally {
-
+			try {
+				reader.close();
+			} catch (IOException e) {
+				log.error("IO error while closing bed file", e);
+			}
 			done = true;
 			synchronized (wait) {
 				wait.notifyAll();

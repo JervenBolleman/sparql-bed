@@ -31,7 +31,7 @@ public class CLI {
 	public static void main(String[] args) throws MalformedQueryException,
 			RepositoryException, QueryEvaluationException, SailException,
 			RDFHandlerException, QueryResultHandlerException {
-		BEDRepository rep = new BEDRepository();
+		BEDFileStore rep = new BEDFileStore();
 		File dataDir = mkTempDir();	
 		System.out.println("Query is" + args[1]);
 		try {
