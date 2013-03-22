@@ -3,6 +3,7 @@ package ch.isbsib.sparql.bed;
 import java.io.File;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +29,8 @@ public class BEDFileBindingReader implements
 		StatementPattern left = (StatementPattern) join.getLeftArg();
 		StatementPattern right = (StatementPattern) join.getRightArg();
 		queue = new ArrayBlockingQueue<BindingSet>(1000);
-		runner = new BindingReaderRunner(file, queue, left, right, valueFactory, bindings);
+		runner = new BindingReaderRunner(file, queue, left, right,
+				valueFactory, bindings, wait);
 		exec.submit(runner);
 	}
 
@@ -40,7 +42,7 @@ public class BEDFileBindingReader implements
 			else
 				try {
 					synchronized (wait) {
-						wait.wait();
+						wait.wait();	
 					}
 				} catch (InterruptedException e) {
 					Thread.interrupted();

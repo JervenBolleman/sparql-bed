@@ -94,7 +94,7 @@
 					</webAppConfig>
 					<systemProperties>
 						<systemProperty>
-							<name>info.aduna.platform.appdata.basedi=</name>
+							<name>info.aduna.platform.appdata.basedir</name>
 							<value>${project.build.directory}/</value>
 						</systemProperty>
 					</systemProperties>

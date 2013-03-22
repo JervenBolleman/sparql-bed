@@ -31,12 +31,14 @@ class BindingReaderRunner implements Runnable {
 	private final StatementPattern left;
 	private final StatementPattern right;
 	private final BindingSet binding;
+	private final String wait;
 
 	public BindingReaderRunner(File bedFile, BlockingQueue<BindingSet> queue,
 			StatementPattern left, StatementPattern right, ValueFactory vf,
-			BindingSet binding) {
+			BindingSet binding, String wait) {
 		this.vf = vf;
 		this.binding = binding;
+		this.wait = wait;
 
 		this.reader = AbstractFeatureReader.getFeatureReader(
 				bedFile.getAbsolutePath(), new BEDCodec(), false);
@@ -68,8 +70,8 @@ class BindingReaderRunner implements Runnable {
 				} catch (InterruptedException e) {
 					Thread.interrupted();
 				}
-				synchronized (BEDFileFilterReader.wait) {
-					BEDFileFilterReader.wait.notifyAll();
+				synchronized (wait) {
+					wait.notify();
 				}
 
 			}
@@ -78,8 +80,8 @@ class BindingReaderRunner implements Runnable {
 		} finally {
 
 			done = true;
-			synchronized (BEDFileFilterReader.wait) {
-				BEDFileFilterReader.wait.notifyAll();
+			synchronized (wait) {
+				wait.notifyAll();
 			}
 		}
 	}

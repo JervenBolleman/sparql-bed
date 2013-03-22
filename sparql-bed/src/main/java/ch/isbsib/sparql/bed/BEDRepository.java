@@ -9,22 +9,22 @@ import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailBase;
 
 public class BEDRepository extends SailBase {
-	private Sail store;
 	private File file;
+	private ValueFactory vf;
 
 	@Override
 	public boolean isWritable() throws SailException {
-		return store.isWritable();
+		return false;
 	}
 
 	@Override
 	public ValueFactory getValueFactory() {
-		return store.getValueFactory();
+		return vf;
 	}
 
 	@Override
 	protected void shutDownInternal() throws SailException {
-		store.shutDown();
+
 	}
 
 	@Override
@@ -32,8 +32,8 @@ public class BEDRepository extends SailBase {
 		return new BEDConnection(file, getValueFactory());
 	}
 
-	public void setSail(Sail sail) {
-		this.store = sail;
+	public void setValueFactory(ValueFactory vf) {
+		this.vf = vf;
 	}
 
 	public void setSamFile(File file){

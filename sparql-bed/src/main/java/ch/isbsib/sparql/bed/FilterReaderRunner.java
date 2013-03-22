@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.regex.Pattern;
 
 import org.broad.tribble.AbstractFeatureReader;
@@ -30,11 +32,13 @@ class FilterReaderRunner implements Runnable {
 	private final File bedFile;
 	private final ValueFactory vf;
 	private final Pattern comma = Pattern.compile(",");
+	private final String wait;
 
 	public FilterReaderRunner(File bedFile, Resource subj, URI pred, Value obj,
-			BlockingQueue<Statement> statements, ValueFactory vf) {
+			BlockingQueue<Statement> statements, ValueFactory vf, String wait) {
 
 		this.vf = vf;
+		this.wait = wait;
 
 		this.reader = AbstractFeatureReader.getFeatureReader(
 				bedFile.getAbsolutePath(), new BEDCodec(), false);
@@ -59,11 +63,11 @@ class FilterReaderRunner implements Runnable {
 						filePath, feature, lineNo++))) {
 					try {
 						statements.put(statement);
+						synchronized (wait) {
+							wait.notify();
+						}
 					} catch (InterruptedException e) {
 						Thread.interrupted();
-					}
-					synchronized (BEDFileFilterReader.wait) {
-						BEDFileFilterReader.wait.notifyAll();
 					}
 				}
 			}
@@ -72,13 +76,11 @@ class FilterReaderRunner implements Runnable {
 		} finally {
 
 			done = true;
-			synchronized (BEDFileFilterReader.wait) {
-				BEDFileFilterReader.wait.notifyAll();
+			synchronized (wait) {
+				wait.notify();
 			}
 		}
 	}
-
-	
 
 	private List<Statement> filter(List<Statement> statements) {
 		List<Statement> filtered = new ArrayList<Statement>();

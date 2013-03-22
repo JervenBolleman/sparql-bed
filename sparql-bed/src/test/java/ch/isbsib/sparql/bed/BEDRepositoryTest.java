@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
@@ -59,7 +60,7 @@ public class BEDRepositoryTest extends TestCase {
 		BEDRepository rep = new BEDRepository();
 		rep.setDataDir(dataDir);
 		rep.setSamFile(newFile);
-		rep.setSail(new MemoryStore(dataDir));
+		rep.setValueFactory(new ValueFactoryImpl());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -85,7 +86,7 @@ public class BEDRepositoryTest extends TestCase {
 		BEDRepository rep = new BEDRepository();
 		rep.setDataDir(dataDir);
 		rep.setSamFile(newFile);
-		rep.setSail(new MemoryStore(dataDir));
+		rep.setValueFactory(new ValueFactoryImpl());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -120,7 +121,7 @@ public class BEDRepositoryTest extends TestCase {
 		BEDRepository rep = new BEDRepository();
 		rep.setDataDir(dataDir);
 		rep.setSamFile(newFile);
-		rep.setSail(new MemoryStore(dataDir));
+		rep.setValueFactory(new ValueFactoryImpl());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(

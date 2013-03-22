@@ -2,6 +2,7 @@ package ch.isbsib.sparql.bed;
 
 import java.io.File;
 
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.MalformedQueryException;
@@ -36,7 +37,7 @@ public class CLI {
 		try {
 			rep.setDataDir(dataDir);
 			rep.setSamFile(new File(args[0]));
-			rep.setSail(new MemoryStore(rep.getDataDir()));
+			rep.setValueFactory(new ValueFactoryImpl());
 			SailRepository sr = new SailRepository(rep);
 			rep.initialize();
 			Query pTQ = sr.getConnection().prepareTupleQuery(

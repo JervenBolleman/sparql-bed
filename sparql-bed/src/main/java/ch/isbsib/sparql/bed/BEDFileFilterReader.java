@@ -3,7 +3,10 @@ package ch.isbsib.sparql.bed;
 import info.aduna.iteration.CloseableIteration;
 
 import java.io.File;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -19,22 +22,22 @@ public class BEDFileFilterReader implements
 		CloseableIteration<Statement, QueryEvaluationException> {
 	private final BlockingQueue<Statement> statements;
 	private final FilterReaderRunner runner;
-	static final String wait = "wait";
+	private final String wait = new String();
 	private final static ExecutorService exec = Executors
 			.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 	public BEDFileFilterReader(File samFile, Resource subj, URI pred,
 			Value obj, Resource[] contexts, ValueFactory valueFactory) {
-		statements = new LinkedBlockingQueue<Statement>();
+		statements = new ArrayBlockingQueue<Statement>(1000);
 		runner = new FilterReaderRunner(samFile, subj, pred, obj, statements,
-				valueFactory);
+				valueFactory, wait);
 		exec.submit(runner);
 	}
 
 	@Override
 	public boolean hasNext() throws QueryEvaluationException {
 		while (!runner.done) {
-			if (!statements.isEmpty())
+			if (statements.peek() != null)
 				return true;
 			else
 				try {
