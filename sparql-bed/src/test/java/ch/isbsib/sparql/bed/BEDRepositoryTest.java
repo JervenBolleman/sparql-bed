@@ -22,7 +22,6 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.SailException;
-import org.openrdf.sail.memory.MemoryStore;
 
 public class BEDRepositoryTest extends TestCase {
 	@Rule

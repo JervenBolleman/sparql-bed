@@ -6,8 +6,6 @@ import org.openrdf.sail.Sail;
 import org.openrdf.sail.config.SailConfigException;
 import org.openrdf.sail.config.SailFactory;
 import org.openrdf.sail.config.SailImplConfig;
-import org.openrdf.sail.memory.MemoryStore;
-import org.openrdf.sail.memory.config.MemoryStoreConfig;
 
 public class BEDFileStoreFactory implements SailFactory {
 
