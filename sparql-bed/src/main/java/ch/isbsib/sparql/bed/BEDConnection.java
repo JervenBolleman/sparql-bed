@@ -1,8 +1,12 @@
 package ch.isbsib.sparql.bed;
 
 import info.aduna.iteration.CloseableIteration;
+import info.aduna.iteration.CloseableIteratorIteration;
+import info.aduna.iteration.EmptyIteration;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
@@ -10,6 +14,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.QueryEvaluationException;
@@ -48,7 +53,6 @@ public class BEDConnection implements SailConnection {
 
 	@Override
 	public void close() throws SailException {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -80,7 +84,6 @@ public class BEDConnection implements SailConnection {
 			new FilterOptimizer().optimize(tupleExpr, dataset, bindings);
 			new OrderLimitOptimizer().optimize(tupleExpr, dataset, bindings);
 
-			CloseableIteration<BindingSet, QueryEvaluationException> iter;
 			return strategy.evaluate(tupleExpr, EmptyBindingSet.getInstance());
 		} catch (QueryEvaluationException e) {
 			throw new SailException(e);
@@ -90,8 +93,7 @@ public class BEDConnection implements SailConnection {
 	@Override
 	public CloseableIteration<? extends Resource, SailException> getContextIDs()
 			throws SailException {
-		// TODO Auto-generated method stub
-		return null;
+		return new EmptyIteration<Resource, SailException>();
 	}
 
 	@Override
@@ -99,19 +101,64 @@ public class BEDConnection implements SailConnection {
 			Resource subj, URI pred, Value obj, boolean includeInferred,
 			Resource... contexts) throws SailException {
 
-		return null;
+		final BEDFileFilterReader bedFileFilterReader = new BEDFileFilterReader(
+				file, subj, pred, obj, contexts, vf);
+		return new CloseableIteratorIteration<Statement, SailException>() {
+
+			@Override
+			public boolean hasNext() throws SailException {
+				try {
+					return bedFileFilterReader.hasNext();
+				} catch (QueryEvaluationException e) {
+					throw new SailException(e);
+				}
+			}
+
+			@Override
+			public Statement next() throws SailException {
+				try {
+					return bedFileFilterReader.next();
+				} catch (QueryEvaluationException e) {
+					throw new SailException(e);
+				}
+			}
+
+			@Override
+			protected void handleClose() throws SailException {
+				try {
+					bedFileFilterReader.close();
+				} catch (QueryEvaluationException e) {
+					throw new SailException(e);
+				}
+				super.handleClose();
+			}
+		};
+
 	}
 
 	@Override
 	public long size(Resource... contexts) throws SailException {
-		// TODO Auto-generated method stub
+		for (Resource context : contexts)
+			if (context == null) {
+				final BEDFileFilterReader bedFileFilterReader = new BEDFileFilterReader(
+						file, null, null, null, null, vf);
+				long count = 0L;
+				try {
+					while (bedFileFilterReader.hasNext()) {
+						bedFileFilterReader.next();
+						count++;
+					}
+				} catch (QueryEvaluationException e) {
+					throw new SailException(e);
+				}
+				return count;
+			}
 		return 0;
 	}
 
 	@Override
 	public void begin() throws SailException {
-		// TODO Auto-generated method stub
-
+		throw new SailException("BED files can not be updated via SPARQL");
 	}
 
 	@Override
@@ -122,7 +169,7 @@ public class BEDConnection implements SailConnection {
 
 	@Override
 	public void commit() throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
@@ -134,84 +181,102 @@ public class BEDConnection implements SailConnection {
 
 	@Override
 	public boolean isActive() throws UnknownSailTransactionStateException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void addStatement(Resource subj, URI pred, Value obj,
 			Resource... contexts) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public void removeStatements(Resource subj, URI pred, Value obj,
 			Resource... contexts) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public void startUpdate(UpdateContext op) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public void addStatement(UpdateContext op, Resource subj, URI pred,
 			Value obj, Resource... contexts) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public void removeStatement(UpdateContext op, Resource subj, URI pred,
 			Value obj, Resource... contexts) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public void endUpdate(UpdateContext op) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public void clear(Resource... contexts) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public CloseableIteration<? extends Namespace, SailException> getNamespaces()
 			throws SailException {
-		// TODO Auto-generated method stub
-		return null;
+
+		return new CloseableIteratorIteration<Namespace, SailException>() {
+			private Iterator<Namespace> namespaces = Arrays.asList(
+					new Namespace[] {
+							new NamespaceImpl(FALDO.PREFIX, FALDO.NAMESPACE),
+							new NamespaceImpl(BED.PREFIX, BED.NAMESPACE) })
+					.iterator();
+
+			@Override
+			public boolean hasNext() throws SailException {
+				return namespaces.hasNext();
+			}
+
+			@Override
+			public Namespace next() throws SailException {
+				return namespaces.next();
+			};
+		};
 	}
 
 	@Override
 	public String getNamespace(String prefix) throws SailException {
-		// TODO Auto-generated method stub
+		if (FALDO.PREFIX.equals(prefix))
+			return FALDO.NAMESPACE;
+		else if (BED.PREFIX.equals(prefix))
+			return BED.NAMESPACE;
 		return null;
 	}
 
 	@Override
 	public void setNamespace(String prefix, String name) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public void removeNamespace(String prefix) throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
 	public void clearNamespaces() throws SailException {
-		// TODO Auto-generated method stub
+		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 

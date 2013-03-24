@@ -1,13 +1,12 @@
 package ch.isbsib.sparql.bed;
 
+import info.aduna.iteration.CloseableIteration;
+
 import java.io.File;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import info.aduna.iteration.CloseableIteration;
 
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
