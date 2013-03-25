@@ -126,8 +126,6 @@
 									<overWrite>true</overWrite>
 									<destFileName>openrdf-sesame-webapp.war</destFileName>
 								</artifactItem>
-							</artifactItems>
-							<artifactItems>
 								<artifactItem>
 									<groupId>org.openrdf.sesame</groupId>
 									<artifactId>sesame-http-server</artifactId>

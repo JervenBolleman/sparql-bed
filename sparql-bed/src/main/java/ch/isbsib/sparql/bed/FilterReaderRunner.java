@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.broad.tribble.AbstractFeatureReader;
@@ -60,10 +61,9 @@ class FilterReaderRunner implements Runnable {
 				for (Statement statement : filter(conv.convertLineToTriples(
 						filePath, feature, lineNo++))) {
 					try {
-						statements.put(statement);
-						synchronized (wait) {
-							wait.notify();
-						}
+						while (!offer(statement) && !this.done)
+							;
+
 					} catch (InterruptedException e) {
 						Thread.interrupted();
 					}
@@ -82,6 +82,15 @@ class FilterReaderRunner implements Runnable {
 				wait.notify();
 			}
 		}
+	}
+
+	protected boolean offer(Statement statement) throws InterruptedException {
+		boolean offer = statements.offer(statement, 100, TimeUnit.MICROSECONDS);
+		if (offer)
+			synchronized (wait) {
+				wait.notify();
+			}
+		return offer;
 	}
 
 	private List<Statement> filter(List<Statement> statements) {
