@@ -7,6 +7,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
@@ -18,8 +19,16 @@ public class BEDFileBindingReader implements
 		CloseableIteration<BindingSet, QueryEvaluationException> {
 
 	private final BindingReaderRunner runner;
-	private final static ExecutorService exec = Executors
-			.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	private final static ExecutorService exec = Executors.newFixedThreadPool(
+			Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+				int a = 0;
+
+				@Override
+				public Thread newThread(Runnable arg0) {
+
+					return new Thread(arg0, "BEDFileBindingReader" + (a++));
+				}
+			});
 	private final BlockingQueue<BindingSet> queue;
 	private final String wait = "wait";
 
@@ -36,12 +45,12 @@ public class BEDFileBindingReader implements
 	@Override
 	public boolean hasNext() throws QueryEvaluationException {
 		while (!runner.done) {
-			if (!queue.isEmpty())
+			if (queue.peek() != null)
 				return true;
 			else
 				try {
 					synchronized (wait) {
-						wait.wait();	
+						wait.wait();
 					}
 				} catch (InterruptedException e) {
 					Thread.interrupted();

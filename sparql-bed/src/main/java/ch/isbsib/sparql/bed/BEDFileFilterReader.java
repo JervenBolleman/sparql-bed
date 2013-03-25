@@ -7,6 +7,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -19,9 +20,17 @@ public class BEDFileFilterReader implements
 		CloseableIteration<Statement, QueryEvaluationException> {
 	private final BlockingQueue<Statement> statements;
 	private final FilterReaderRunner runner;
-	private final String wait = new String();
-	private final static ExecutorService exec = Executors
-			.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	private final String wait = "wait";
+	private final static ExecutorService exec = Executors.newFixedThreadPool(
+			Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+				int a = 0;
+
+				@Override
+				public Thread newThread(Runnable arg0) {
+
+					return new Thread(arg0, "BEDFileFilterReader" + (a++));
+				}
+			});
 
 	public BEDFileFilterReader(File samFile, Resource subj, URI pred,
 			Value obj, Resource[] contexts, ValueFactory valueFactory) {
