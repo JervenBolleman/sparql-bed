@@ -1,6 +1,7 @@
 package ch.isbsib.sparql.bed;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.broad.tribble.Feature;
@@ -16,9 +17,19 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 
 public class BEDToTripleConverter {
-	public BEDToTripleConverter(ValueFactory vf) {
+	private final boolean type;
+
+	public BEDToTripleConverter(ValueFactory vf, URI... preds) {
 		super();
 		this.vf = vf;
+		List<URI> predList = Arrays.asList(preds);
+		boolean tempType = predList.contains(RDF.TYPE);
+		if (predList.isEmpty() || predList.contains(null)) {
+			tempType = true;
+		}
+		type = tempType;
+		// type = predList.contains(RDF.TYPE) || predList.isEmpty() ||
+		// predList.contains(null);
 	}
 
 	private final ValueFactory vf;
@@ -29,16 +40,22 @@ public class BEDToTripleConverter {
 		String recordPath = filePath + '/' + lineNo;
 		URI recordId = vf.createURI(recordPath);
 		add(stats, recordId, BED.CHROMOSOME, feature.getChr());
-		add(stats, recordId, RDF.TYPE, BED.FEATURE_CLASS);
-		add(stats, recordId, RDF.TYPE, FALDO.REGION_CLASS);
+		if (type) {
+			add(stats, recordId, RDF.TYPE, BED.FEATURE_CLASS);
+			add(stats, recordId, RDF.TYPE, FALDO.REGION_CLASS);
+		}
 		URI alignStartId = vf.createURI(recordPath + "#start");
 		add(stats, recordId, FALDO.BEGIN_PREDICATE, alignStartId);
-		add(stats, alignStartId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+		if (type) {
+			add(stats, alignStartId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+		}
 		add(stats, alignStartId, FALDO.POSTION_PREDICATE, feature.getStart());
 		add(stats, alignStartId, FALDO.REFERENCE_PREDICATE, feature.getChr());
 		URI alignEndId = vf.createURI(recordPath + "#end");
 		add(stats, recordId, FALDO.END_PREDICATE, alignEndId);
-		add(stats, alignEndId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+		if (type) {
+			add(stats, alignEndId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+		}
 		add(stats, alignEndId, FALDO.POSTION_PREDICATE, feature.getEnd());
 		add(stats, alignEndId, FALDO.REFERENCE_PREDICATE, feature.getChr());
 		if (feature instanceof BEDFeature) {
@@ -67,13 +84,16 @@ public class BEDToTripleConverter {
 			URI beginId = vf.createURI(exonPath + "/begin");
 			URI endId = vf.createURI(exonPath + "/end");
 			add(stats, recordId, BED.EXON, endId);
-			add(stats, exonId, RDF.TYPE, FALDO.REGION_CLASS);
+			if (type) {
+				add(stats, exonId, RDF.TYPE, FALDO.REGION_CLASS);
+				add(stats, endId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+			}
 			add(stats, exonId, FALDO.BEGIN_PREDICATE, beginId);
 			add(stats, beginId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
 			add(stats, beginId, FALDO.POSTION_PREDICATE, exon.getCdStart());
 			add(stats, beginId, FALDO.REFERENCE_PREDICATE, feature.getChr());
 			add(stats, exonId, FALDO.END_PREDICATE, endId);
-			add(stats, endId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+
 			add(stats, endId, FALDO.POSTION_PREDICATE, exon.getCdEnd());
 			add(stats, endId, FALDO.REFERENCE_PREDICATE, feature.getChr());
 		}

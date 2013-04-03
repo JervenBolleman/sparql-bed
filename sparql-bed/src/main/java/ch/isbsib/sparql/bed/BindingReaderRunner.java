@@ -30,15 +30,11 @@ class BindingReaderRunner implements Runnable {
 	private final ValueFactory vf;
 	private final StatementPattern left;
 	private final StatementPattern right;
-	
-	private final String wait;
 
 	public BindingReaderRunner(File bedFile, BlockingQueue<BindingSet> queue,
 			StatementPattern left, StatementPattern right, ValueFactory vf,
-			BindingSet binding, String wait) {
+			BindingSet binding) {
 		this.vf = vf;
-	
-		this.wait = wait;
 
 		this.reader = AbstractFeatureReader.getFeatureReader(
 				bedFile.getAbsolutePath(), new BEDCodec(), false);
@@ -54,7 +50,9 @@ class BindingReaderRunner implements Runnable {
 		String filePath = "file:///" + bedFile.getAbsolutePath();
 		Iterable<Feature> iter;
 		try {
-			BEDToTripleConverter conv = new BEDToTripleConverter(vf);
+			
+			BEDToTripleConverter conv = new BEDToTripleConverter(vf,
+					 findKnownPredicates());
 			iter = reader.iterator();
 			for (Feature feature : iter) {
 				List<Statement> statements = conv.convertLineToTriples(
@@ -70,10 +68,6 @@ class BindingReaderRunner implements Runnable {
 				} catch (InterruptedException e) {
 					Thread.interrupted();
 				}
-				synchronized (wait) {
-					wait.notify();
-				}
-
 			}
 		} catch (IOException e) {
 			log.error("IO error while reading bed file", e);
@@ -84,10 +78,22 @@ class BindingReaderRunner implements Runnable {
 				log.error("IO error while closing bed file", e);
 			}
 			done = true;
-			synchronized (wait) {
-				wait.notifyAll();
-			}
 		}
+	}
+
+	protected URI[] findKnownPredicates() {
+		List<URI> preds = new ArrayList<URI>();
+		Value vr = right.getPredicateVar().getValue();
+		Value vl = left.getPredicateVar().getValue();
+		if (vr instanceof URI)
+			preds.add((URI) vr);
+		else
+			preds.add(null);
+		if (vl instanceof URI)
+			preds.add((URI) vl);
+		else
+			preds.add(null);
+		return preds.toArray(new URI[]{});
 	}
 
 	private void find(List<Statement> statements, StatementPattern left2,

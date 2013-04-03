@@ -3,10 +3,12 @@ package ch.isbsib.sparql.bed;
 import info.aduna.iteration.CloseableIteration;
 
 import java.io.File;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
@@ -21,7 +23,8 @@ public class BEDFileBindingReader implements
 	private final static ExecutorService exec = Executors
 			.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private final BlockingQueue<BindingSet> queue;
-	private final String wait = "wait";
+	private BindingSet next;
+	private boolean closed;
 
 	public BEDFileBindingReader(File file, BindingSet bindings, Join join,
 			ValueFactory valueFactory) {
@@ -29,31 +32,33 @@ public class BEDFileBindingReader implements
 		StatementPattern right = (StatementPattern) join.getRightArg();
 		queue = new ArrayBlockingQueue<BindingSet>(1000);
 		runner = new BindingReaderRunner(file, queue, left, right,
-				valueFactory, bindings, wait);
+				valueFactory, bindings);
 		exec.submit(runner);
 	}
 
 	@Override
 	public boolean hasNext() throws QueryEvaluationException {
-		while (!runner.done) {
-			if (!queue.isEmpty())
-				return true;
-			else
-				try {
-					synchronized (wait) {
-						wait.wait();	
-					}
-				} catch (InterruptedException e) {
-					Thread.interrupted();
-					return hasNext();
+		next = null;
+		while (!runner.done || !queue.isEmpty()) {
+			try {
+				next = queue.poll(1, TimeUnit.SECONDS);
+				if (next != null) {
+					return true;
 				}
+			} catch (InterruptedException e) {
+				Thread.interrupted();
+			}
 		}
-		return !queue.isEmpty();
+		return false;
 	}
 
 	@Override
 	public BindingSet next() throws QueryEvaluationException {
-		return queue.poll();
+		if (next == null)
+			throw new NoSuchElementException("Iteration is exhausted");
+		if (closed)
+			throw new IllegalStateException("Iteration is closed");
+		return next;
 	}
 
 	@Override
@@ -65,6 +70,7 @@ public class BEDFileBindingReader implements
 	@Override
 	public void close() throws QueryEvaluationException {
 		runner.done = true;
+		closed = true;
 	}
 
 }

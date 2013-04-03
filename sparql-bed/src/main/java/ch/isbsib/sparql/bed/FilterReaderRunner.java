@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -31,13 +32,11 @@ class FilterReaderRunner implements Runnable {
 	private final File bedFile;
 	private final ValueFactory vf;
 	private final Pattern comma = Pattern.compile(",");
-	private final String wait;
 
 	public FilterReaderRunner(File bedFile, Resource subj, URI pred, Value obj,
-			BlockingQueue<Statement> statements, ValueFactory vf, String wait) {
+			BlockingQueue<Statement> statements, ValueFactory vf) {
 
 		this.vf = vf;
-		this.wait = wait;
 
 		this.reader = AbstractFeatureReader.getFeatureReader(
 				bedFile.getAbsolutePath(), new BEDCodec(), false);
@@ -55,7 +54,7 @@ class FilterReaderRunner implements Runnable {
 		String filePath = "file:///" + bedFile.getAbsolutePath();
 		Iterable<Feature> iter;
 		try {
-			BEDToTripleConverter conv = new BEDToTripleConverter(vf);
+			BEDToTripleConverter conv = new BEDToTripleConverter(vf, pred);
 			iter = reader.iterator();
 			for (Feature feature : iter) {
 				for (Statement statement : filter(conv.convertLineToTriples(
@@ -78,18 +77,11 @@ class FilterReaderRunner implements Runnable {
 				log.error("IO error while closing bed file", e);
 			}
 			done = true;
-			synchronized (wait) {
-				wait.notify();
-			}
 		}
 	}
 
 	protected boolean offer(Statement statement) throws InterruptedException {
 		boolean offer = statements.offer(statement, 100, TimeUnit.MICROSECONDS);
-		if (offer)
-			synchronized (wait) {
-				wait.notify();
-			}
 		return offer;
 	}
 
