@@ -8,7 +8,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
 
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
@@ -20,8 +22,16 @@ public class BEDFileBindingReader implements
 		CloseableIteration<BindingSet, QueryEvaluationException> {
 
 	private final BindingReaderRunner runner;
-	private final static ExecutorService exec = Executors
-			.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	private final static ExecutorService exec = Executors.newFixedThreadPool(
+			Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
+				int a = 0;
+
+				@Override
+				public Thread newThread(Runnable arg0) {
+
+					return new Thread(arg0, "BEDFileBindingReader" + (a++));
+				}
+			});
 	private final BlockingQueue<BindingSet> queue;
 	private BindingSet next;
 	private boolean closed;

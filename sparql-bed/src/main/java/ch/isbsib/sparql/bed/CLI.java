@@ -1,6 +1,7 @@
 package ch.isbsib.sparql.bed;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.BooleanQuery;
@@ -9,8 +10,8 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.Query;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.QueryResultHandlerException;
 import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.query.resultio.BooleanQueryResultFormat;
 import org.openrdf.query.resultio.BooleanQueryResultWriter;
 import org.openrdf.query.resultio.QueryResultIO;
@@ -25,7 +26,7 @@ import org.openrdf.sail.SailException;
 public class CLI {
 	public static void main(String[] args) throws MalformedQueryException,
 			RepositoryException, QueryEvaluationException, SailException,
-			RDFHandlerException, QueryResultHandlerException {
+			RDFHandlerException, IOException, TupleQueryResultHandlerException {
 		BEDFileStore rep = new BEDFileStore();
 		File dataDir = mkTempDir();	
 		System.out.println("Query is" + args[1]);
@@ -48,10 +49,7 @@ public class CLI {
 				BooleanQueryResultWriter createWriter = QueryResultIO
 						.createWriter(BooleanQueryResultFormat.TEXT, System.out);
 				boolean evaluate = ((BooleanQuery) pTQ).evaluate();
-				createWriter.startDocument();
-				createWriter.startHeader();
-				createWriter.endHeader();
-				createWriter.handleBoolean(evaluate);
+				createWriter.write(evaluate);
 			}
 		} finally {
 			System.out.println("done");
