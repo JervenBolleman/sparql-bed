@@ -14,7 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<sesame.version>2.7.0-beta3-SNAPSHOT</sesame.version>
+		<sesame.version>2.7.0</sesame.version>
 		<picard.version>1.70</picard.version>
 	</properties>
 	<repositories>
@@ -23,15 +23,6 @@
 			<name>Central Repository</name>
 			<url>http://repo.maven.apache.org/maven2</url>
 			<layout>default</layout>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>aduna</id>
-			<name>Aduna Repository</name>
-			<url>http://repo.aduna-software.org/maven2/releases</url>
-
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
