@@ -28,7 +28,7 @@ public class BEDFileFilterReader implements
 
 	public BEDFileFilterReader(File samFile, Resource subj, URI pred,
 			Value obj, Resource[] contexts, ValueFactory valueFactory) {
-		statements = new ArrayBlockingQueue<Statement>(1000);
+		statements = new ArrayBlockingQueue<Statement>(10000);
 		runner = new FilterReaderRunner(samFile, subj, pred, obj, statements,
 				valueFactory);
 		exec.submit(runner);

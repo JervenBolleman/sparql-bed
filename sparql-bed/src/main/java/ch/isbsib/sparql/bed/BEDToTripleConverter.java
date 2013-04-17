@@ -54,10 +54,7 @@ public class BEDToTripleConverter {
 		add(stats, recordId, BED.CHROMOSOME, feature.getChr());
 
 		if (rdftype) {
-			add(stats, recordId, RDF.TYPE, BED.FEATURE_CLASS);
-			add(stats, recordId, RDF.TYPE, FALDO.REGION_CLASS);
-			add(stats, alignStartId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
-			add(stats, alignEndId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+			rdfTypesForFeature(stats, recordId, alignStartId, alignEndId);
 		}
 		if (faldobegin) {
 			add(stats, recordId, FALDO.BEGIN_PREDICATE, alignStartId);
@@ -77,6 +74,14 @@ public class BEDToTripleConverter {
 		return stats;
 	}
 
+	protected void rdfTypesForFeature(List<Statement> stats, URI recordId,
+			URI alignStartId, URI alignEndId) {
+		add(stats, recordId, RDF.TYPE, BED.FEATURE_CLASS);
+		add(stats, recordId, RDF.TYPE, FALDO.REGION_CLASS);
+		add(stats, alignStartId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+		add(stats, alignEndId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+	}
+
 	private List<Statement> convertLineToTriples(String filePath,
 			BEDFeature feature, long lineNo) {
 		List<Statement> stats = new ArrayList<Statement>(28);
@@ -86,33 +91,38 @@ public class BEDToTripleConverter {
 			add(stats, recordId, RDFS.LABEL, feature.getName());
 		if (feature.getScore() != Float.NaN) // score
 			add(stats, recordId, BED.SCORE, feature.getScore());
-		addStrandedNessInformation(stats, feature, recordId);
-		// we skip position 678 as these are colouring instructions
+		if (rdftype)
+			addStrandedNessInformation(stats, feature, recordId);
+		// we skip position 6,7 and 8 as these are colouring instructions
 
 		for (Exon exon : feature.getExons()) {
-
-			String exonPath = recordPath + "/exon/" + exon.getNumber();
-			URI exonId = vf.createURI(exonPath);
-			URI beginId = vf.createURI(exonPath + "/begin");
-			URI endId = vf.createURI(exonPath + "/end");
-			add(stats, recordId, BED.EXON, endId);
-			if (rdftype) {
-				add(stats, exonId, RDF.TYPE, FALDO.REGION_CLASS);
-				add(stats, endId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
-			}
-			if (faldobegin) {
-				add(stats, exonId, FALDO.BEGIN_PREDICATE, beginId);
-			}
-			add(stats, beginId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
-			add(stats, beginId, FALDO.POSTION_PREDICATE, exon.getCdStart());
-			add(stats, beginId, FALDO.REFERENCE_PREDICATE, feature.getChr());
-			if (faldoend) {
-				add(stats, exonId, FALDO.END_PREDICATE, endId);
-			}
-			add(stats, endId, FALDO.POSTION_PREDICATE, exon.getCdEnd());
-			add(stats, endId, FALDO.REFERENCE_PREDICATE, feature.getChr());
+			convertExon(feature, stats, recordPath, recordId, exon);
 		}
 		return stats;
+	}
+
+	protected void convertExon(BEDFeature feature, List<Statement> stats,
+			String recordPath, URI recordId, Exon exon) {
+		String exonPath = recordPath + "/exon/" + exon.getNumber();
+		URI exonId = vf.createURI(exonPath);
+		URI beginId = vf.createURI(exonPath + "/begin");
+		URI endId = vf.createURI(exonPath + "/end");
+		add(stats, recordId, BED.EXON, endId);
+		if (rdftype) {
+			add(stats, exonId, RDF.TYPE, FALDO.REGION_CLASS);
+			add(stats, endId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+		}
+		if (faldobegin) {
+			add(stats, exonId, FALDO.BEGIN_PREDICATE, beginId);
+		}
+		add(stats, beginId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
+		add(stats, beginId, FALDO.POSTION_PREDICATE, exon.getCdStart());
+		add(stats, beginId, FALDO.REFERENCE_PREDICATE, feature.getChr());
+		if (faldoend) {
+			add(stats, exonId, FALDO.END_PREDICATE, endId);
+		}
+		add(stats, endId, FALDO.POSTION_PREDICATE, exon.getCdEnd());
+		add(stats, endId, FALDO.REFERENCE_PREDICATE, feature.getChr());
 	}
 
 	protected void addStrandedNessInformation(List<Statement> statements,
