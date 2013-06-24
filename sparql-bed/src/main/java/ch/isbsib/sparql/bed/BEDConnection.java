@@ -19,7 +19,6 @@ import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
-import org.openrdf.query.algebra.UpdateExpr;
 import org.openrdf.query.algebra.evaluation.EvaluationStrategy;
 import org.openrdf.query.algebra.evaluation.impl.BindingAssigner;
 import org.openrdf.query.algebra.evaluation.impl.CompareOptimizer;
@@ -34,6 +33,8 @@ import org.openrdf.query.algebra.evaluation.impl.SameTermFilterOptimizer;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
+import org.openrdf.sail.UnknownSailTransactionStateException;
+import org.openrdf.sail.UpdateContext;
 //import org.openrdf.sail.UnknownSailTransactionStateException;
 //import org.openrdf.sail.UpdateContext;
 
@@ -157,16 +158,16 @@ public class BEDConnection implements SailConnection {
 		return 0;
 	}
 
-//	@Override
-//	public void begin() throws SailException {
-//		throw new SailException("BED files can not be updated via SPARQL");
-//	}
-//
-//	@Override
-//	public void prepare() throws SailException {
-//		// TODO Auto-generated method stub
-//
-//	}
+	// @Override
+	// public void begin() throws SailException {
+	// throw new SailException("BED files can not be updated via SPARQL");
+	// }
+	//
+	// @Override
+	// public void prepare() throws SailException {
+	// // TODO Auto-generated method stub
+	//
+	// }
 
 	@Override
 	public void commit() throws SailException {
@@ -180,10 +181,10 @@ public class BEDConnection implements SailConnection {
 
 	}
 
-//	@Override
-//	public boolean isActive() throws UnknownSailTransactionStateException {
-//		return false;
-//	}
+	// @Override
+	// public boolean isActive() throws UnknownSailTransactionStateException {
+	// return false;
+	// }
 
 	@Override
 	public void addStatement(Resource subj, URI pred, Value obj,
@@ -199,31 +200,31 @@ public class BEDConnection implements SailConnection {
 
 	}
 
-//	@Override
-//	public void startUpdate(UpdateContext op) throws SailException {
-//		throw new SailException("BED files can not be updated via SPARQL");
-//
-//	}
-//
-//	@Override
-//	public void addStatement(UpdateContext op, Resource subj, URI pred,
-//			Value obj, Resource... contexts) throws SailException {
-//		throw new SailException("BED files can not be updated via SPARQL");
-//
-//	}
-//
-//	@Override
-//	public void removeStatement(UpdateContext op, Resource subj, URI pred,
-//			Value obj, Resource... contexts) throws SailException {
-//		throw new SailException("BED files can not be updated via SPARQL");
-//
-//	}
-//
-//	@Override
-//	public void endUpdate(UpdateContext op) throws SailException {
-//		throw new SailException("BED files can not be updated via SPARQL");
-//
-//	}
+	// @Override
+	// public void startUpdate(UpdateContext op) throws SailException {
+	// throw new SailException("BED files can not be updated via SPARQL");
+	//
+	// }
+	//
+	// @Override
+	// public void addStatement(UpdateContext op, Resource subj, URI pred,
+	// Value obj, Resource... contexts) throws SailException {
+	// throw new SailException("BED files can not be updated via SPARQL");
+	//
+	// }
+	//
+	// @Override
+	// public void removeStatement(UpdateContext op, Resource subj, URI pred,
+	// Value obj, Resource... contexts) throws SailException {
+	// throw new SailException("BED files can not be updated via SPARQL");
+	//
+	// }
+	//
+	// @Override
+	// public void endUpdate(UpdateContext op) throws SailException {
+	// throw new SailException("BED files can not be updated via SPARQL");
+	//
+	// }
 
 	@Override
 	public void clear(Resource... contexts) throws SailException {
@@ -282,8 +283,41 @@ public class BEDConnection implements SailConnection {
 	}
 
 	@Override
-	public void executeUpdate(UpdateExpr arg0, Dataset arg1, BindingSet arg2,
-			boolean arg3) throws SailException {
+	public void addStatement(UpdateContext arg0, Resource arg1, URI arg2,
+			Value arg3, Resource... arg4) throws SailException {
+		throw new SailException("BED files can not be updated via SPARQL");
+	}
+
+	@Override
+	public void begin() throws SailException {
+		throw new SailException("BED files can not be updated via SPARQL");
+
+	}
+
+	@Override
+	public void endUpdate(UpdateContext arg0) throws SailException {
+		throw new SailException("BED files can not be updated via SPARQL");
+
+	}
+
+	@Override
+	public boolean isActive() throws UnknownSailTransactionStateException {
+		return false;
+	}
+
+	@Override
+	public void prepare() throws SailException {
+		throw new SailException("BED files can not be updated via SPARQL");
+	}
+
+	@Override
+	public void removeStatement(UpdateContext arg0, Resource arg1, URI arg2,
+			Value arg3, Resource... arg4) throws SailException {
+		throw new SailException("BED files can not be updated via SPARQL");
+	}
+
+	@Override
+	public void startUpdate(UpdateContext arg0) throws SailException {
 		throw new SailException("BED files can not be updated via SPARQL");
 	}
 
