@@ -35,7 +35,7 @@ public class BEDFileStore extends AbstractSail {
 		this.vf = vf;
 	}
 
-	public void setSamFile(File file){
+	public void setBedFile(File file){
 		this.file =file;
 	}
 }

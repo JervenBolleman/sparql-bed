@@ -32,7 +32,7 @@ public class CLI {
 		System.out.println("Query is" + args[1]);
 		try {
 			rep.setDataDir(dataDir);
-			rep.setSamFile(new File(args[0]));
+			rep.setBedFile(new File(args[0]));
 			rep.setValueFactory(new SimpleValueFactory());
 			SailRepository sr = new SailRepository(rep);
 			rep.initialize();

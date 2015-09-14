@@ -39,7 +39,7 @@ public class BEDFileStoreFactory implements SailFactory {
 		if (config instanceof BEDFileConfig) {
 			BEDFileConfig memConfig = (BEDFileConfig)config;
 
-			memoryStore.setSamFile(new File(memConfig.getFile()));
+			memoryStore.setBedFile(new File(memConfig.getFile()));
 		}
 
 		return memoryStore;

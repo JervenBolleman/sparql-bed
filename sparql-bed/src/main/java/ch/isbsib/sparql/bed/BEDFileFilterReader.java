@@ -26,10 +26,10 @@ public class BEDFileFilterReader implements
 	private final static ExecutorService exec = Executors
 			.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-	public BEDFileFilterReader(File samFile, Resource subj, IRI pred,
+	public BEDFileFilterReader(File bedFile, Resource subj, IRI pred,
 			Value obj, Resource[] contexts, ValueFactory valueFactory) {
 		statements = new ArrayBlockingQueue<Statement>(10000);
-		runner = new FilterReaderRunner(samFile, subj, pred, obj, statements,
+		runner = new FilterReaderRunner(bedFile, subj, pred, obj, statements,
 				valueFactory);
 		exec.submit(runner);
 	}

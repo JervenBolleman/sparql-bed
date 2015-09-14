@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
@@ -26,8 +26,8 @@ import org.openrdf.sail.SailException;
 public class BEDRepositoryTest extends TestCase {
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
-	private File newFile = null;
-	private File dataDir = null;
+	protected File newFile = null;
+	protected File dataDir = null;
 
 	@Before
 	public void setUp() {
@@ -58,8 +58,8 @@ public class BEDRepositoryTest extends TestCase {
 		assertTrue(newFile.exists());
 		BEDFileStore rep = new BEDFileStore();
 		rep.setDataDir(dataDir);
-		rep.setSamFile(newFile);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setBedFile(newFile);
+		rep.setValueFactory(new SimpleValueFactory());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -84,8 +84,8 @@ public class BEDRepositoryTest extends TestCase {
 		assertTrue(newFile.exists());
 		BEDFileStore rep = new BEDFileStore();
 		rep.setDataDir(dataDir);
-		rep.setSamFile(newFile);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setBedFile(newFile);
+		rep.setValueFactory(new SimpleValueFactory());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -95,8 +95,7 @@ public class BEDRepositoryTest extends TestCase {
 		assertTrue(eval.hasNext());
 		BindingSet next = eval.next();
 		assertNotNull(next);
-		assertEquals(next.getBinding("countScore").getValue().stringValue(),
-				"9");
+		assertEquals("9", next.getBinding("countScore").getValue().stringValue());
 	}
 
 	String query3 = "PREFIX bed:<"
@@ -119,8 +118,8 @@ public class BEDRepositoryTest extends TestCase {
 		assertTrue(newFile.exists());
 		BEDFileStore rep = new BEDFileStore();
 		rep.setDataDir(dataDir);
-		rep.setSamFile(newFile);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setBedFile(newFile);
+		rep.setValueFactory(new SimpleValueFactory());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -131,7 +130,7 @@ public class BEDRepositoryTest extends TestCase {
 		BindingSet next = eval.next();
 		assertNotNull(next);
 		Binding lb = next.getBinding("avgLength");
-		assertEquals("", "1166", lb.getValue()
+		assertEquals("1166", lb.getValue()
 				.stringValue());
 	}
 }
