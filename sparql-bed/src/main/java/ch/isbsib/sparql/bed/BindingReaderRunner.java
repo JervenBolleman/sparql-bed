@@ -10,8 +10,10 @@ import java.util.concurrent.BlockingQueue;
 import org.broad.tribble.AbstractFeatureReader;
 import org.broad.tribble.Feature;
 import org.broad.tribble.bed.BEDCodec;
+import org.broad.tribble.bed.BEDFeature;
+import org.broad.tribble.readers.LineIterator;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
@@ -24,7 +26,7 @@ class BindingReaderRunner implements Runnable {
 	private static final Logger log = LoggerFactory
 			.getLogger(BindingReaderRunner.class);
 	private final BlockingQueue<BindingSet> queue;
-	private final AbstractFeatureReader reader;
+	private final AbstractFeatureReader<BEDFeature, LineIterator> reader;
 	volatile boolean done = false;
 	private final File bedFile;
 	private final ValueFactory vf;
@@ -48,7 +50,7 @@ class BindingReaderRunner implements Runnable {
 	public void run() {
 		long lineNo = 0;
 		String filePath = "file:///" + bedFile.getAbsolutePath();
-		Iterable<Feature> iter;
+		Iterable<BEDFeature> iter;
 		try {
 			
 			BEDToTripleConverter conv = new BEDToTripleConverter(vf,
@@ -81,19 +83,19 @@ class BindingReaderRunner implements Runnable {
 		}
 	}
 
-	protected URI[] findKnownPredicates() {
-		List<URI> preds = new ArrayList<URI>();
+	protected IRI[] findKnownPredicates() {
+		List<IRI> preds = new ArrayList<IRI>();
 		Value vr = right.getPredicateVar().getValue();
 		Value vl = left.getPredicateVar().getValue();
-		if (vr instanceof URI)
-			preds.add((URI) vr);
+		if (vr instanceof IRI)
+			preds.add((IRI) vr);
 		else
 			preds.add(null);
-		if (vl instanceof URI)
-			preds.add((URI) vl);
+		if (vl instanceof IRI)
+			preds.add((IRI) vl);
 		else
 			preds.add(null);
-		return preds.toArray(new URI[]{});
+		return preds.toArray(new IRI[]{});
 	}
 
 	private void find(List<Statement> statements, StatementPattern left2,
@@ -140,7 +142,7 @@ class BindingReaderRunner implements Runnable {
 		for (Iterator<Statement> iterator = statements.iterator(); iterator
 				.hasNext();) {
 			Statement statement = iterator.next();
-			URI predicate = statement.getPredicate();
+			IRI predicate = statement.getPredicate();
 			if (!(predicate.equals(lv) || predicate.equals(rv)))
 				iterator.remove();
 		}

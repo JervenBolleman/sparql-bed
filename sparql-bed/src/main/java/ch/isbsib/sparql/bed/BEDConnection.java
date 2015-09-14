@@ -13,10 +13,9 @@ import org.openrdf.model.IRI;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.NamespaceImpl;
+import org.openrdf.model.impl.SimpleNamespace;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.QueryEvaluationException;
@@ -144,18 +143,19 @@ public class BEDConnection implements SailConnection {
 	public long size(Resource... contexts) throws SailException {
 		for (Resource context : contexts)
 			if (context == null) {
-				final BEDFileFilterReader bedFileFilterReader = new BEDFileFilterReader(
-						file, null, null, null, null, vf);
-				long count = 0L;
-				try {
-					while (bedFileFilterReader.hasNext()) {
-						bedFileFilterReader.next();
-						count++;
+				try (final BEDFileFilterReader bedFileFilterReader = new BEDFileFilterReader(
+						file, null, null, null, null, vf)) {
+					long count = 0L;
+					try {
+						while (bedFileFilterReader.hasNext()) {
+							bedFileFilterReader.next();
+							count++;
+						}
+					} catch (QueryEvaluationException e) {
+						throw new SailException(e);
 					}
-				} catch (QueryEvaluationException e) {
-					throw new SailException(e);
+					return count;
 				}
-				return count;
 			}
 		return 0;
 	}
@@ -241,8 +241,8 @@ public class BEDConnection implements SailConnection {
 		return new CloseableIteratorIteration<Namespace, SailException>() {
 			private Iterator<Namespace> namespaces = Arrays.asList(
 					new Namespace[] {
-							new NamespaceImpl(FALDO.PREFIX, FALDO.NAMESPACE),
-							new NamespaceImpl(BED.PREFIX, BED.NAMESPACE) })
+							new SimpleNamespace(FALDO.PREFIX, FALDO.NAMESPACE),
+							new SimpleNamespace(BED.PREFIX, BED.NAMESPACE) })
 					.iterator();
 
 			@Override
@@ -327,13 +327,13 @@ public class BEDConnection implements SailConnection {
 	public void begin(IsolationLevel arg0)
 			throws UnknownSailTransactionStateException, SailException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void flush() throws SailException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

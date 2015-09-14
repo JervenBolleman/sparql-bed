@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.QueryEvaluationException;
@@ -26,7 +26,7 @@ public class BEDFileFilterReader implements
 	private final static ExecutorService exec = Executors
 			.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-	public BEDFileFilterReader(File samFile, Resource subj, URI pred,
+	public BEDFileFilterReader(File samFile, Resource subj, IRI pred,
 			Value obj, Resource[] contexts, ValueFactory valueFactory) {
 		statements = new ArrayBlockingQueue<Statement>(10000);
 		runner = new FilterReaderRunner(samFile, subj, pred, obj, statements,

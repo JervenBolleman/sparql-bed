@@ -6,14 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import org.broad.tribble.AbstractFeatureReader;
 import org.broad.tribble.Feature;
 import org.broad.tribble.bed.BEDCodec;
+import org.broad.tribble.bed.BEDFeature;
+import org.broad.tribble.readers.LineIterator;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.slf4j.Logger;
@@ -25,14 +26,14 @@ class FilterReaderRunner implements Runnable {
 	private final BlockingQueue<Statement> statements;
 	private final Resource subj;
 	private final Value obj;
-	private final URI pred;
-	private final AbstractFeatureReader reader;
+	private final IRI pred;
+	private final AbstractFeatureReader<BEDFeature, LineIterator> reader;
 	volatile boolean done = false;
 	private final File bedFile;
 	private final ValueFactory vf;
-	private final Pattern comma = Pattern.compile(",");
+//	private final Pattern comma = Pattern.compile(",");
 
-	public FilterReaderRunner(File bedFile, Resource subj, URI pred, Value obj,
+	public FilterReaderRunner(File bedFile, Resource subj, IRI pred, Value obj,
 			BlockingQueue<Statement> statements, ValueFactory vf) {
 
 		this.vf = vf;
@@ -51,7 +52,7 @@ class FilterReaderRunner implements Runnable {
 	public void run() {
 		long lineNo = 0;
 		String filePath = "file:///" + bedFile.getAbsolutePath();
-		Iterable<Feature> iter;
+		Iterable<BEDFeature> iter;
 		try {
 			BEDToTripleConverter conv = new BEDToTripleConverter(vf, pred);
 			iter = reader.iterator();

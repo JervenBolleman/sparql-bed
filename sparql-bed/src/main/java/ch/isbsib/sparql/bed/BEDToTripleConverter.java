@@ -8,9 +8,9 @@ import org.broad.tribble.Feature;
 import org.broad.tribble.annotation.Strand;
 import org.broad.tribble.bed.BEDFeature;
 import org.broad.tribble.bed.FullBEDFeature.Exon;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDF;
@@ -21,10 +21,10 @@ public class BEDToTripleConverter {
 	private final boolean faldobegin;
 	private final boolean faldoend;
 
-	public BEDToTripleConverter(ValueFactory vf, URI... preds) {
+	public BEDToTripleConverter(ValueFactory vf, IRI... preds) {
 		super();
 		this.vf = vf;
-		List<URI> predList = Arrays.asList(preds);
+		List<IRI> predList = Arrays.asList(preds);
 		boolean tempType = predList.contains(RDF.TYPE);
 		boolean tempfaldobegin = predList.contains(FALDO.BEGIN_PREDICATE);
 		boolean tempfaldoend = predList.contains(FALDO.END_PREDICATE);
@@ -47,9 +47,9 @@ public class BEDToTripleConverter {
 			Feature feature, long lineNo) {
 		List<Statement> stats = new ArrayList<Statement>(28);
 		String recordPath = filePath + '/' + lineNo;
-		URI recordId = vf.createURI(recordPath);
-		URI alignStartId = vf.createURI(recordPath + "#start");
-		URI alignEndId = vf.createURI(recordPath + "#end");
+		IRI recordId = vf.createIRI(recordPath);
+		IRI alignStartId = vf.createIRI(recordPath + "#start");
+		IRI alignEndId = vf.createIRI(recordPath + "#end");
 
 		add(stats, recordId, BED.CHROMOSOME, feature.getChr());
 
@@ -74,8 +74,8 @@ public class BEDToTripleConverter {
 		return stats;
 	}
 
-	protected void rdfTypesForFeature(List<Statement> stats, URI recordId,
-			URI alignStartId, URI alignEndId) {
+	protected void rdfTypesForFeature(List<Statement> stats, IRI recordId,
+			IRI alignStartId, IRI alignEndId) {
 		add(stats, recordId, RDF.TYPE, BED.FEATURE_CLASS);
 		add(stats, recordId, RDF.TYPE, FALDO.REGION_CLASS);
 		add(stats, alignStartId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
@@ -86,7 +86,7 @@ public class BEDToTripleConverter {
 			BEDFeature feature, long lineNo) {
 		List<Statement> stats = new ArrayList<Statement>(28);
 		String recordPath = filePath + '/' + lineNo;
-		URI recordId = vf.createURI(recordPath);
+		IRI recordId = vf.createIRI(recordPath);
 		if (feature.getName() != null) // name
 			add(stats, recordId, RDFS.LABEL, feature.getName());
 		if (feature.getScore() != Float.NaN) // score
@@ -102,11 +102,11 @@ public class BEDToTripleConverter {
 	}
 
 	protected void convertExon(BEDFeature feature, List<Statement> stats,
-			String recordPath, URI recordId, Exon exon) {
+			String recordPath, IRI recordId, Exon exon) {
 		String exonPath = recordPath + "/exon/" + exon.getNumber();
-		URI exonId = vf.createURI(exonPath);
-		URI beginId = vf.createURI(exonPath + "/begin");
-		URI endId = vf.createURI(exonPath + "/end");
+		IRI exonId = vf.createIRI(exonPath);
+		IRI beginId = vf.createIRI(exonPath + "/begin");
+		IRI endId = vf.createIRI(exonPath + "/end");
 		add(stats, recordId, BED.EXON, endId);
 		if (rdftype) {
 			add(stats, exonId, RDF.TYPE, FALDO.REGION_CLASS);
@@ -126,7 +126,7 @@ public class BEDToTripleConverter {
 	}
 
 	protected void addStrandedNessInformation(List<Statement> statements,
-			BEDFeature feature, URI alignEndId) {
+			BEDFeature feature, IRI alignEndId) {
 
 		if (Strand.POSITIVE == feature.getStrand()) {
 			add(statements, alignEndId, RDF.TYPE,
@@ -140,26 +140,26 @@ public class BEDToTripleConverter {
 
 	}
 
-	private void add(List<Statement> statements, URI subject, URI predicate,
+	private void add(List<Statement> statements, IRI subject, IRI predicate,
 			String string) {
 		add(statements, subject, predicate, vf.createLiteral(string));
 
 	}
 
-	private void add(List<Statement> statements, URI subject, URI predicate,
+	private void add(List<Statement> statements, IRI subject, IRI predicate,
 			int string) {
 		add(statements, subject, predicate, vf.createLiteral(string));
 
 	}
 
-	private void add(List<Statement> statements, URI subject, URI predicate,
+	private void add(List<Statement> statements, IRI subject, IRI predicate,
 			float string) {
 		add(statements, subject, predicate, vf.createLiteral(string));
 
 	}
 
 	private void add(List<Statement> statements, Resource subject,
-			URI predicate, Value object) {
+			IRI predicate, Value object) {
 		statements.add(vf.createStatement(subject, predicate, object));
 	}
 }

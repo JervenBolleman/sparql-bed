@@ -1,16 +1,16 @@
 package ch.isbsib.sparql.bed;
 
-import org.openrdf.model.Namespace;
 import org.openrdf.model.IRI;
+import org.openrdf.model.Namespace;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.NamespaceImpl;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleNamespace;
+import org.openrdf.model.impl.SimpleValueFactory;
 
 public class FALDO {
 	public static final String PREFIX = "faldo";
 	public static final String NAMESPACE = "http://biohackathon.org/resource/faldo#";
 
-	public static final Namespace NS = new NamespaceImpl(PREFIX, NAMESPACE);
+	public static final Namespace NS = new SimpleNamespace(PREFIX, NAMESPACE);
 
 	public static final IRI BOTH_STRANDS_POSITION_CLASS;
 	public static final IRI EXACT_POSITION_CLASS;
@@ -34,7 +34,7 @@ public class FALDO {
 	public static final IRI REFERENCE_PREDICATE;
 
 	static {
-		final ValueFactory f = ValueFactoryImpl.getInstance();
+		final ValueFactory f = new SimpleValueFactory();
 
 		// Properties common to Faldo
 		BOTH_STRANDS_POSITION_CLASS = f.createIRI(NAMESPACE, "BothStrandsPosition");

@@ -1,9 +1,8 @@
 package ch.isbsib.sparql.bed;
 
 import org.openrdf.model.IRI;
-import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.impl.SimpleValueFactory;
 
 public class BEDFileStoreSchema {
 	/** The BEDFileStore schema namespace (<tt>http://www..org/config/sail/memory#</tt>). */
@@ -12,7 +11,7 @@ public class BEDFileStoreSchema {
 	public final static IRI FILE;
 
 		static {
-		ValueFactory factory = ValueFactoryImpl.getInstance();
+		ValueFactory factory = new SimpleValueFactory();
 		FILE = factory.createIRI(NAMESPACE, "file");
 	}
 }

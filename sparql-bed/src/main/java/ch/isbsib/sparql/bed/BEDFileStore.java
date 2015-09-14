@@ -5,9 +5,9 @@ import java.io.File;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
-import org.openrdf.sail.helpers.SailBase;
+import org.openrdf.sail.helpers.AbstractSail;
 
-public class BEDFileStore extends SailBase {
+public class BEDFileStore extends AbstractSail {
 	private File file;
 	private ValueFactory vf;
 
