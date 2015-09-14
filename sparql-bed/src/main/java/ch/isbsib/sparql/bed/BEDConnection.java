@@ -8,6 +8,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.openrdf.IsolationLevel;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -100,7 +102,7 @@ public class BEDConnection implements SailConnection {
 
 	@Override
 	public CloseableIteration<? extends Statement, SailException> getStatements(
-			Resource subj, URI pred, Value obj, boolean includeInferred,
+			Resource subj, IRI pred, Value obj, boolean includeInferred,
 			Resource... contexts) throws SailException {
 
 		final BEDFileFilterReader bedFileFilterReader = new BEDFileFilterReader(
@@ -187,14 +189,14 @@ public class BEDConnection implements SailConnection {
 	// }
 
 	@Override
-	public void addStatement(Resource subj, URI pred, Value obj,
+	public void addStatement(Resource subj, IRI pred, Value obj,
 			Resource... contexts) throws SailException {
 		throw new SailException("BED files can not be updated via SPARQL");
 
 	}
 
 	@Override
-	public void removeStatements(Resource subj, URI pred, Value obj,
+	public void removeStatements(Resource subj, IRI pred, Value obj,
 			Resource... contexts) throws SailException {
 		throw new SailException("BED files can not be updated via SPARQL");
 
@@ -283,7 +285,7 @@ public class BEDConnection implements SailConnection {
 	}
 
 	@Override
-	public void addStatement(UpdateContext arg0, Resource arg1, URI arg2,
+	public void addStatement(UpdateContext arg0, Resource arg1, IRI arg2,
 			Value arg3, Resource... arg4) throws SailException {
 		throw new SailException("BED files can not be updated via SPARQL");
 	}
@@ -311,7 +313,7 @@ public class BEDConnection implements SailConnection {
 	}
 
 	@Override
-	public void removeStatement(UpdateContext arg0, Resource arg1, URI arg2,
+	public void removeStatement(UpdateContext arg0, Resource arg1, IRI arg2,
 			Value arg3, Resource... arg4) throws SailException {
 		throw new SailException("BED files can not be updated via SPARQL");
 	}
@@ -319,6 +321,26 @@ public class BEDConnection implements SailConnection {
 	@Override
 	public void startUpdate(UpdateContext arg0) throws SailException {
 		throw new SailException("BED files can not be updated via SPARQL");
+	}
+
+	@Override
+	public void begin(IsolationLevel arg0)
+			throws UnknownSailTransactionStateException, SailException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void flush() throws SailException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean hasStatement(Resource subj, IRI pred, Value obj,
+			boolean includeInferred, Resource... contexts) throws SailException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -14,8 +14,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<sesame.version>2.7.0</sesame.version>
-		<picard.version>1.70</picard.version>
+		<sesame.version>4.0.0-M1</sesame.version>
+		<picard.version>1.102.0</picard.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -26,14 +26,6 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-		</repository>
-		<repository>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<id>ens</id>
-			<name>ENS repository</name>
-			<url>http://transcriptome.ens.fr/maven2</url>
 		</repository>
 	</repositories>
 	<build>
@@ -216,7 +208,7 @@
 		<dependency>
 			<groupId>org.utgenome.thirdparty</groupId>
 			<artifactId>picard</artifactId>
-			<version>1.86.0</version>
+			<version>${picard.version}</version>
 		</dependency>
 	</dependencies>
 	<reporting>

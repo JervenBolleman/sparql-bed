@@ -7,10 +7,11 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.util.GraphUtilException;
+import org.openrdf.sail.config.AbstractSailImplConfig;
 import org.openrdf.sail.config.SailConfigException;
 import org.openrdf.sail.config.SailImplConfigBase;
 
-public class BEDFileConfig extends SailImplConfigBase {
+public class BEDFileConfig extends AbstractSailImplConfig {
 
 	private String file;
 

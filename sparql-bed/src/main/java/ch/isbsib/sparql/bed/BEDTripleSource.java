@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.openrdf.model.IRI;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -23,7 +24,7 @@ public class BEDTripleSource implements TripleSource {
 	private File file;
 	private ValueFactory vf;
 
-	private static final Set<URI> possiblePredicates = new HashSet<URI>();
+	private static final Set<IRI> possiblePredicates = new HashSet<>();
 	{
 		possiblePredicates.add(RDF.TYPE);
 		possiblePredicates.add(BED.CHROMOSOME);
@@ -45,7 +46,7 @@ public class BEDTripleSource implements TripleSource {
 
 	@Override
 	public CloseableIteration<? extends Statement, QueryEvaluationException> getStatements(
-			Resource subj, URI pred, Value obj, Resource... contexts)
+			Resource subj, IRI pred, Value obj, Resource... contexts)
 			throws QueryEvaluationException {
 		if (pred == null || possiblePredicates.contains(pred)) {
 			return new BEDFileFilterReader(file, subj, pred, obj, contexts,
