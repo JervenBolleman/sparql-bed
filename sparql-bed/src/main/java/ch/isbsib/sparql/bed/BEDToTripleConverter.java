@@ -68,7 +68,7 @@ public class BEDToTripleConverter {
 		add(stats, alignEndId, FALDO.POSTION_PREDICATE, feature.getEnd());
 		add(stats, alignEndId, FALDO.REFERENCE_PREDICATE, feature.getChr());
 		if (feature instanceof BEDFeature) {
-			stats.addAll(convertLineToTriples(filePath, (BEDFeature) feature,
+			stats.addAll(convertBEDFeatureToTriples(filePath, (BEDFeature) feature,
 					lineNo));
 		}
 		return stats;
@@ -82,7 +82,7 @@ public class BEDToTripleConverter {
 		add(stats, alignEndId, RDF.TYPE, FALDO.EXACT_POSITION_CLASS);
 	}
 
-	private List<Statement> convertLineToTriples(String filePath,
+	private List<Statement> convertBEDFeatureToTriples(String filePath,
 			BEDFeature feature, long lineNo) {
 		List<Statement> stats = new ArrayList<Statement>(28);
 		String recordPath = filePath + '/' + lineNo;
