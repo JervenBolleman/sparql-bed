@@ -1,6 +1,9 @@
 sparql-bed
 ==========
 
+The idea works, but this is not and won't be production code.
+If you are interested in it please let me know for now it is in archive mode.
+
 sparql against simple bed files without loading them into a triple store.
 
 ```
